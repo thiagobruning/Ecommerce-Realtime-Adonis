@@ -29,7 +29,22 @@ class ProductSchema extends Schema {
         .references('id')
         .inTable('images')
         .onDelete('CASCADE')
-      table.foreign('product')
+      table.foreign('product_id')
+        .references('id')
+        .inTable('products')
+        .onDelete('CASCADE')
+    })
+
+    // n to n categoria e produtos
+    this.create('category_product', (table) => {
+      table.increments()
+      table.integer('product_id').unsigned()
+      table.integer('category_id').unsigned()
+      table.foreign('category_id')
+        .references('id')
+        .inTable('categories')
+        .onDelete('CASCADE')
+      table.foreign('product_id')
         .references('id')
         .inTable('products')
         .onDelete('CASCADE')
@@ -37,6 +52,7 @@ class ProductSchema extends Schema {
   }
 
   down () {
+    this.drop('category_product')
     this.drop('image_product')
     this.drop('products')
   }
