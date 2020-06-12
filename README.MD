@@ -9,6 +9,6 @@
   - adonis install @adonisjs/validator
   - adonis install @adonisjs/websocket
   - npm i adonis-acl --save (then... https://www.npmjs.com/package/adonis-acl)
-  - bash: adonis acl:setup
+  - terminal: adonis acl:setup
   - adonis install adonis-bumblebee (generate collections)
 ```
