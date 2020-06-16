@@ -27,7 +27,6 @@ class Product extends Model {
   {
     return this.belongsToMany('App/Models/Coupon')
   }
-
 }
 
 module.exports = Product

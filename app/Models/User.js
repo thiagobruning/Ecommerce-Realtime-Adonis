@@ -38,7 +38,7 @@ class User extends Model {
   tokens() {
     return this.hasMany("App/Models/Token");
   }
-}
+
   /**
    * Relationships
    */
@@ -51,5 +51,6 @@ class User extends Model {
   {
     return this.belongsToMany('App/Models/Coupon')
   }
+}
 
 module.exports = User
