@@ -52,9 +52,18 @@ class AuthController {
     return response.send({ data:user })
   }
 
+  /**
+   * get the active refreshToken and delete from database
+   */
   async logout({ auth, request, response })
   {
-    //
+    var refreshToken = request.input('refresh_token')
+    if(!refreshToken) {
+      refreshToken = request.header('refresh_token')
+    }
+
+    await auth.authenticator('jwt').revokeTokens([refreshToken], true)
+    return response.status(204).send({})
   }
 
   /** Refresh password methods */
