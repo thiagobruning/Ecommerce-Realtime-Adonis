@@ -21,6 +21,7 @@ Route.get('/', () => {
 })
 
 /**
- * import auth routes
+ * import routes
  */
 require('./auth')
+require('./admin')
