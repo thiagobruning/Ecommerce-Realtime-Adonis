@@ -1,6 +1,6 @@
 'use strict'
 
-const Factory = require('@adonisjs/lucid/src/Factory')
+// const Factory = require('@adonisjs/lucid/src/Factory')
 
 /*
 |--------------------------------------------------------------------------
@@ -26,11 +26,15 @@ class ClientSeeder {
    */
   async run () {
     const clientRole = Role.findBy('slug', 'client')
-    const clients = Factory.model('App/Models/User').createMany(20)
+    const clients = await Factory.model('App/Models/User').createMany(20)
 
-    await Promisse.all(clients.map( async client => {
+    await Promise.all(clients.map( async client => {
       await client.roles().attach([clientRole.id])
     }))
+
+    /**
+     * Created a admin and assign admin role to him
+     */
 
     const admin = await User.create({
       name: 'Thiago',
@@ -39,7 +43,7 @@ class ClientSeeder {
       password: '123456'
     })
 
-    const adminRole = Role.findBy('slug', 'admin');
+    const adminRole = await Role.findBy('slug', 'admin');
     await admin.roles().attach([adminRole.id])
   }
 }
