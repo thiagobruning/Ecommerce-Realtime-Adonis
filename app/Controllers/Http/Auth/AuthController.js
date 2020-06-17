@@ -5,12 +5,12 @@ const Role = use('Role')
 
 class AuthController {
 
-  async register({ request, response })
-  {
     /**
      * Using transactions to avoid errors in database, and rollback the request
      * when occur a error
      */
+  async register({ request, response })
+  {
     const trx = await Database.beginTransaction()
 
     try {
@@ -29,7 +29,10 @@ class AuthController {
 
   async login({ auth, request, response })
   {
-    //
+    const { email, password } = request.all()
+    let data = await auth.withRefreshToken().attempt(email, password)
+
+    return response.send({ data })
   }
 
   /** Refresh token */
