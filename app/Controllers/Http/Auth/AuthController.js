@@ -36,7 +36,7 @@ class AuthController {
   }
 
   /** Refresh token */
-  async refresh({ request, response })
+  async refresh({ request, response, auth })
   {
     /**
      * if refresh not passed through body,
