@@ -7,9 +7,20 @@ const Category = use('App/Models/Category')
 
 class CategoryController {
 
-  async index ({ request, response, view, pagination }) {
+  async index ({ request, response, pagination }) {
+
+    /**
+     * Get title property and add a query
+     * to find categories by title
+     */
+    const title = request.input('title')
+    const query = Category.query()
+    if(title) {
+      query.where('title', 'LIKE', `%${title}%`)
+    }
+
     /** default page and limit por page */
-    const categories = await Category.query().paginate(pagination.page, pagination.limit)
+    const categories = await query.paginate(pagination.page, pagination.limit)
     return response.send(categories)
   }
 
