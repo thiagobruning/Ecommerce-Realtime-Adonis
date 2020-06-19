@@ -25,6 +25,17 @@ class CategoryController {
   }
 
   async store ({ request, response }) {
+    try {
+      const { title, description, image_id } = request.all()
+      const category = await Category.create({ title, description, image_id })
+
+      return response.status(201).send(category)
+    } catch (error) {
+      return response.status(400).send({
+        message: 'Erro ao processar a sua solicitação.'
+      })
+    }
+
   }
 
   async show ({ params, request, response, view }) {
