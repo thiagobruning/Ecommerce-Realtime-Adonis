@@ -4,65 +4,33 @@
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
-/**
- * Resourceful controller for interacting with products
- */
+const Product = use('App/Models/Product')
+
 class ProductController {
-  /**
-   * Show a list of all products.
-   * GET products
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async index ({ request, response, view }) {
+
+  async index ({ request, response, pagination }) {
+      const name = request.input('name')
+      const query = Product.query()
+      if(name) {
+        query.where('name', 'LIKE', `%${name}%`)
+      }
+
+      /** default page and limit por page */
+      const products = await query.paginate(pagination.page, pagination.limit)
+      return response.send(products)
   }
 
-  /**
-   * Create/save a new product.
-   * POST products
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
   async store ({ request, response }) {
+    
   }
 
-  /**
-   * Display a single product.
-   * GET products/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async show ({ params, request, response, view }) {
+  async show ({ params: { id }, request, response }) {
   }
 
-  /**
-   * Update product details.
-   * PUT or PATCH products/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update ({ params, request, response }) {
+  async update ({ params: { id }, request, response }) {
   }
 
-  /**
-   * Delete a product with id.
-   * DELETE products/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params: { id }, request, response }) {
   }
 }
 
