@@ -36,6 +36,18 @@ class ProductController {
   }
 
   async update ({ params: { id }, request, response }) {
+    const product = await Product.findOrFail(id)
+    try {
+      const { name, image_id, description, price } = request.all()
+      product.merge({ name, image_id, description, price })
+      await product.save()
+
+      return response.send(product)
+    } catch (error) {
+      return response.status(400).send({
+        message: 'Erro ao processar a sua solicitação.'
+      })
+    }
   }
 
   async destroy ({ params: { id }, request, response }) {
