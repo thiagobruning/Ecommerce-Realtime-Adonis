@@ -46,11 +46,17 @@ class CategoryController {
 
   async update ({ params: { id }, request, response }) {
     const category = await Category.findOrFail(id)
-    const { title, description, image_id } = request.all()
-    category.merge({ title, description, image_id })
-    await category.save()
+    try {
+      const { title, description, image_id } = request.all()
+      category.merge({ title, description, image_id })
+      await category.save()
 
-    return response.send(category)
+      return response.send(category)
+    } catch (error) {
+      return response.status(400).send({
+        message: 'Erro ao processar a sua solicitação.'
+      })
+    }
   }
 
   async destroy ({ params: { id }, response }) {
