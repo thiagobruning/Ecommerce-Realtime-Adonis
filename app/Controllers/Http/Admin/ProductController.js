@@ -21,8 +21,8 @@ class ProductController {
   }
 
   async store ({ request, response }) {
+    const { name, image_id, description, price } = request.all()
     try {
-      const { name, image_id, description, price } = request.all()
       const product = await Product.create({ name, image_id, description, price })
       return response.status(201).send(product)
     } catch (error) {
