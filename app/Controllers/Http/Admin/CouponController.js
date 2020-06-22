@@ -4,89 +4,86 @@
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
-/**
- * Resourceful controller for interacting with coupons
- */
+const Coupon = use('App/Models/Coupon')
+const Database = use('Database')
+const Service = use('App/Services/Coupon/CouponService')
+
 class CouponController {
-  /**
-   * Show a list of all coupons.
-   * GET coupons
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async index ({ request, response, view }) {
+
+  async index ({ response, pagination }) {
+    const code = request.input('code')
+    const query = Coupon.query()
+
+    if(code) {
+      query.where('code', 'LIKE', `%${code}%`)
+    }
+
+    const coupons = await query.paginate(pagination.page, pagination.limit)
+    return response.send(coupons)
   }
 
-  /**
-   * Render a form to be used for creating a new coupon.
-   * GET coupons/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
-  }
-
-  /**
-   * Create/save a new coupon.
-   * POST coupons
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
   async store ({ request, response }) {
+    /**
+     * 1 - products - Can be used in specifics products
+     * 2 - clients - can be used by specifics clientes
+     * 3 - can be used in any order
+     */
+
+     const trx = await Database.beginTransaction()
+     var can_use_for = {
+       product: false,
+      client: false
+     }
+
+     try {
+       const couponData = request.only([
+         'code',
+         'discount',
+         'valid_from',
+         'valid_until',
+         'quantity',
+         'type'
+        ])
+
+      const { users, products } = request.only([ 'users', 'products' ])
+      const coupon = await Coupon.create(couponData, trx)
+      const service = new Service(coupon, trx)
+
+     } catch (error) {
+
+     }
   }
 
-  /**
-   * Display a single coupon.
-   * GET coupons/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async show ({ params, request, response, view }) {
+  async show ({ params: { id }, response }) {
+    const coupon = await Coupon.findOrFail(id)
+
+    return response.send(coupon)
   }
 
-  /**
-   * Render a form to update an existing coupon.
-   * GET coupons/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
-  }
-
-  /**
-   * Update coupon details.
-   * PUT or PATCH coupons/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
   async update ({ params, request, response }) {
   }
 
-  /**
-   * Delete a coupon with id.
-   * DELETE coupons/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params: { id }, response }) {
+    const coupon = await Coupon.findOrFail(id)
+    const trx = await Database.beginTransaction()
+
+    try {
+      /** Detach all relationships before delete the coupon
+       * to avoid orphan data
+       */
+      await coupon.products.detach([], trx)
+      await coupon.orders.detach([], trx)
+      await coupon.users.detach([], trx)
+
+      await coupon.delete(trx)
+      await trx.commit()
+      return response.status(204).send()
+    } catch (error) {
+      await trx.rollback()
+      return response.status(500).send({
+        message: 'Não foi possível deletar este cupom'
+      })
+    }
   }
 }
 
