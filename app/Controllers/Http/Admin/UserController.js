@@ -53,12 +53,12 @@ class UserController {
   }
 
   async destroy ({ params: { id }, request, response }) {
-    const user = User.findOrFail(id)
+    const user = await User.findOrFail(id)
     try {
       await user.delete()
       return response.status(204).send()
     } catch (error) {
-      return response.status(400).send({
+      return response.status(500).send({
         message: 'Não foi possível deletar este usuário'
       })
     }
