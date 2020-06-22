@@ -1,6 +1,6 @@
 'use strict'
 
-const Crypto = use('Crypto')
+const Crypto = use('crypto')
 const Helpers = use('Helpers')
 
 
@@ -18,7 +18,7 @@ const str_random = async (length = 40) => {
     if(len < length) {
         let size = length - len
         let bytes = await Crypto.randomBytes(size)
-        let buffer = new Buffer(bytes)
+        let buffer = Buffer.from(bytes)
         string += buffer
             .toString('base64')
             .replace(/[^a-zA-Z]/g, '')
