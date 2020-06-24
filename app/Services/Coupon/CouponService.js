@@ -1,5 +1,9 @@
 'use strict'
 
+/**
+ * Class to assign users or orders or products
+ * to a coupon, while create the coupon
+ */
 class CouponService {
   constructor(model, trx = null) {
     this.model = model
