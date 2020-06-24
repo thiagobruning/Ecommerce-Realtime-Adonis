@@ -1,5 +1,7 @@
 'use strict'
 
+const Database = use('Database')
+
 class OrderService {
   constructor(model, trx = null) {
     this.model = model
@@ -35,6 +37,88 @@ class OrderService {
       item.fill(items.find(n => n.id === item.id))
       await item.save(this.trx)
     }))
+  }
+
+  /**
+   * Check if the passed coupon can ble applied
+   * in the order
+   */
+  async canApplyDiscount(coupon)
+  {
+    /**
+     *  take the products with this coupon
+     **/
+    const couponProducts = await Database
+      .from('coupon_product')
+      .where('coupon_id', coupon.id)
+      .pluck('product_id')
+
+    /**
+     * take the clients with this coupon
+     */
+    const couponClients = await Database
+      .from('coupon_user')
+      .where('coupon_id', coupon.id)
+      .pluck('user_id')
+
+    /**
+     * check if the coupon is NOT associated to
+     * products and clients especifcs
+     */
+    if(Array.isArray(couponProducts) && couponProducts < 1 && Array.isArray(couponClients) && couponClients < 1) {
+      return true
+    }
+
+    let isAssociatedToProducts, isAssociatedToClients = false
+
+    if(Array.isArray(couponProducts) && couponProducts.length > 0) {
+      isAssociatedToProducts = true
+    }
+
+    if(Array.isArray(couponClients) && couponClients.length > 0) {
+      isAssociatedToClients = true
+    }
+
+    const productsMatch = await Database
+      .from('order_items')
+      .where('order_id', this.model.id)
+      .whereIn('product_id', couponProducts)
+      .pluck('product_id')
+
+    /** case 1 - the coupon is associeted
+     * with clients and products
+     */
+    if(isAssociatedToClients && isAssociatedToProducts) {
+      const clientMatch = couponClients.find(
+        client => client === this.model.user_id
+      )
+
+      if(clientMatch && Array.isArray(productsMatch) && productsMatch.length > 0) {
+        return true
+      }
+    }
+
+    /** case 2 - the coupon is just associated
+     * with product
+     */
+    if(isAssociatedToProducts && Array.isArray(productsMatch) && productsMatch.length > 0) {
+      return true
+    }
+
+    /** case 3 - the coupon is just associated
+     * with clients
+     */
+    if(isAssociatedToClients && Array.isArray(couponClients) && couponClients.length > 0) {
+      const match = couponClients.find(client => client === this.model.user_id)
+
+      if(match) {
+        return true
+      }
+    }
+
+    /** case 4 - coupon is not ready to be applied
+     * in this order
+     */
   }
 }
 
