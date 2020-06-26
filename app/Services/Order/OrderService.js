@@ -45,6 +45,21 @@ class OrderService {
    */
   async canApplyDiscount(coupon)
   {
+
+    /**
+     * Validate if discount has expired
+     */
+
+    const now = new Date().getTime()
+    /**
+     * if has intered in the validation period
+     * if have a date to expires
+     * if passed the time of expiration
+     */
+    if(now > coupon.valid_from.getTime() || (typeof coupon.valid_until == 'object' && coupon.valid_until.getTime() < now)) {
+      return false
+    }
+
     /**
      *  take the products with this coupon
      **/
