@@ -19,3 +19,4 @@ Route.group(() => {
 
 }).prefix('v1/admin')
   .namespace('Admin') // Admin folder
+  .middleware(['auth', 'is: (admin || manager)'])
