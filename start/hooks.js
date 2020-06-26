@@ -1,7 +1,5 @@
 const { hooks } = require('@adonisjs/ignitor')
 
-const Validator = use('Validator')
-const Database = use('Database')
 hooks.after.providersBooted(() => {
   const Validator = use('Validator')
   const Database = use('Database')
