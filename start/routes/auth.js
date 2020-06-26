@@ -7,19 +7,19 @@
 const Route = use('Route')
 
 Route.group( () =>{
-  Route.post('register', 'AuthController.register').as('auth.register')
-  Route.post('login', 'AuthController.login').as('auth.login')
-  Route.post('refresh', 'AuthController.refresh').as('auth.refresh')
-  Route.post('logout', 'AuthController.logout').as('auth.logout')
+  Route.post('register', 'AuthController.register').as('auth.register').middleware(['guest'])
+  Route.post('login', 'AuthController.login').as('auth.login').middleware(['guest'])
+  Route.post('refresh', 'AuthController.refresh').as('auth.refresh').middleware(['guest'])
+  Route.post('logout', 'AuthController.logout').as('auth.logout').middleware(['auth'])
 
   /** receive email and generate token */
-  Route.post('reset-password', 'AuthController.forgotPassword').as('auth.forgot')
+  Route.post('reset-password', 'AuthController.forgotPassword').as('auth.forgot').middleware(['guest'])
 
   /** check if token is valid */
-  Route.get('reset-password', 'AuthController.remember').as('auth.remember')
+  Route.get('reset-password', 'AuthController.remember').as('auth.remember').middleware(['guest'])
 
   /** receive new password and update the password */
-  Route.put('reset-password', 'AuthController.reset').as('auth.reset')
+  Route.put('reset-password', 'AuthController.reset').as('auth.reset').middleware(['guest'])
 
 }).prefix('v1/auth')
   .namespace('Auth') // namespace = folder of group
