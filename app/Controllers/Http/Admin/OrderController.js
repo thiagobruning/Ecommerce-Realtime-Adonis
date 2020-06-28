@@ -26,7 +26,7 @@ class OrderController {
       query.orWhere('id', 'LIKE', `%${id}%`)
     }
 
-    const orders = query.paginate(pagination.page, pagination.limit)
+    const orders = await query.paginate(pagination.page, pagination.limit)
     return response.send(orders)
   }
 
@@ -109,8 +109,8 @@ class OrderController {
     const coupon = await Coupon.findOrFail('code', code.toUpperCase())
 
     var discount, info = {}
+    const service = new Service(order)
     try {
-      const service = new Service(order)
       const canAddDiscount = await service.canApplyDiscount(coupon)
       const orderDiscounts = await order.coupons().getCount()
 
@@ -118,8 +118,8 @@ class OrderController {
       const canApplyToOrder = orderDiscounts < 1 || (orderDiscounts >= 1 && coupon.recursive)
       if(canAddDiscount && canApplyToOrder) {
         discount = await Discount.findOrCreate({
-          order_id = order.id,
-          coupon_id = coupon.id
+          order_id: order.id,
+          coupon_id: coupon.id
         })
 
         info.message = 'Cupom aplicado com sucesso!'

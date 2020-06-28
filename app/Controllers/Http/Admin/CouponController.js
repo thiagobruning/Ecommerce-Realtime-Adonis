@@ -10,7 +10,7 @@ const Service = use('App/Services/Coupon/CouponService')
 
 class CouponController {
 
-  async index ({ response, pagination }) {
+  async index ({ request, response, pagination }) {
     const code = request.input('code')
     const query = Coupon.query()
 
