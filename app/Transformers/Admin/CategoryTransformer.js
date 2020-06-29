@@ -9,6 +9,11 @@ class CategoryTransformer extends BumblebeeTransformer {
     return ['image']
   }
 
+  // optional includes
+  availableInclude() {
+    return ['posts']
+  }
+
   transform (model) {
     return {
      id: model.id,

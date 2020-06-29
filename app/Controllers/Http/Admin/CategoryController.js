@@ -26,10 +26,11 @@ class CategoryController {
     return response.send(categories)
   }
 
-  async store ({ request, response }) {
+  async store ({ request, transform, response }) {
     try {
       const { title, description, image_id } = request.all()
-      const category = await Category.create({ title, description, image_id })
+      var category = await Category.create({ title, description, image_id })
+      category = await transform.item(category, transformer)
 
       return response.status(201).send(category)
     } catch (error) {
@@ -40,19 +41,19 @@ class CategoryController {
 
   }
 
-  async show ({ params: { id }, response }) {
-    const category = await Category.findOrFail(id)
-
+  async show ({ params: { id }, response, transform }) {
+    var category = await Category.findOrFail(id)
+    category = await transform.item(category, transformer)
     return response.send(category)
   }
 
-  async update ({ params: { id }, request, response }) {
-    const category = await Category.findOrFail(id)
+  async update ({ params: { id },transform, request, response }) {
+    var category = await Category.findOrFail(id)
     try {
       const { title, description, image_id } = request.all()
       category.merge({ title, description, image_id })
       await category.save()
-
+      category = await transform.item(category, transformer)
       return response.send(category)
     } catch (error) {
       return response.status(400).send({
