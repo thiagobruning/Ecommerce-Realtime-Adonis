@@ -5,10 +5,11 @@
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 
 const Product = use('App/Models/Product')
+const transformer = use('App/Transformers/Admin/ProductTransformer')
 
 class ProductController {
 
-  async index ({ request, response, pagination }) {
+  async index ({ request, response, pagination, transform }) {
       const name = request.input('name')
       const query = Product.query()
       if(name) {
@@ -16,14 +17,16 @@ class ProductController {
       }
 
       /** default page and limit por page */
-      const products = await query.paginate(pagination.page, pagination.limit)
+      var products = await query.paginate(pagination.page, pagination.limit)
+      products = await transform.paginate(products, transformer)
       return response.send(products)
   }
 
-  async store ({ request, response }) {
+  async store ({ request, response, transform }) {
     const { name, image_id, description, price } = request.all()
     try {
-      const product = await Product.create({ name, image_id, description, price })
+      var product = await Product.create({ name, image_id, description, price })
+      product = await transform.item(product, transformer)
       return response.status(201).send(product)
     } catch (error) {
       return response.status(400).send({
@@ -32,18 +35,20 @@ class ProductController {
     }
   }
 
-  async show ({ params: { id }, response }) {
-    const product = await Product.findOrFail(id)
+  async show ({ params: { id }, response, transform }) {
+    var product = await Product.findOrFail(id)
+    product = await transform.item(product, transformer)
 
     return response.send(product)
   }
 
-  async update ({ params: { id }, request, response }) {
-    const product = await Product.findOrFail(id)
+  async update ({ params: { id }, request, response, transform }) {
+    var product = await Product.findOrFail(id)
     try {
       const { name, image_id, description, price } = request.all()
       product.merge({ name, image_id, description, price })
       await product.save()
+      product = await transform.item(product, transformer)
 
       return response.send(product)
     } catch (error) {
