@@ -4,10 +4,11 @@
 /** @typedef {import('@adonisjs/framework/src/Response')} Response */
 /** @typedef {import('@adonisjs/framework/src/View')} View */
 const Category = use('App/Models/Category')
+const transformer = use('App/Transformers/Admin/CategoryTransformer')
 
 class CategoryController {
 
-  async index ({ request, response, pagination }) {
+  async index ({ request, response, transform ,pagination }) {
 
     /**
      * Get title property and add a query
@@ -20,7 +21,8 @@ class CategoryController {
     }
 
     /** default page and limit por page */
-    const categories = await query.paginate(pagination.page, pagination.limit)
+    var categories = await query.paginate(pagination.page, pagination.limit)
+    categories = await transform.paginate(categories, transformer)
     return response.send(categories)
   }
 
