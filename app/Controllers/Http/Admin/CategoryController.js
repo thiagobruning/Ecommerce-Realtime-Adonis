@@ -38,7 +38,6 @@ class CategoryController {
         message: 'Erro ao processar a sua solicitação.'
       })
     }
-
   }
 
   async show ({ params: { id }, response, transform }) {
