@@ -10,16 +10,6 @@
   adonis seed
 ```
 
-## Dependencies
-```bash
- adonis install @adonisjs/mail
- adonis install @adonisjs/validator
- adonis install @adonisjs/websocket
- npm i adonis-acl --save (then... https://www.npmjs.com/package/adonis-acl)
- adonis acl:setup
- adonis install adonis-bumblebee (generate collections)
-```
-
 ## Create a development branch (use master to releases, production or updates)
 ```bash
   git checkout -b development
