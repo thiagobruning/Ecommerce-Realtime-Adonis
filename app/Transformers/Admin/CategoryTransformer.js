@@ -10,20 +10,20 @@ class CategoryTransformer extends BumblebeeTransformer {
   }
 
   // optional includes
-  availableInclude() {
-    return ['posts']
-  }
+  // availableInclude() {
+  //   return ['posts']
+  // }
 
-  transform (model) {
+  transform (category) {
     return {
-     id: model.id,
-     title: model.title,
-     description: model.description
+     id: category.id,
+     title: category.title,
+     description: category.description
     }
   }
 
-  includeImage(model) {
-    return this.item(model.getRelated('image'), ImageTransformer) // Take the relation name in the model
+  includeImage(category) {
+    return this.item(category.getRelated('image'), ImageTransformer) // Take the relation name in the model
   }
 }
 
