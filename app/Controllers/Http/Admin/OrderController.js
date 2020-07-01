@@ -5,10 +5,11 @@ const Coupon = use('App/Models/Coupon')
 const Discount = use('App/Models/Discount')
 const Database = use('Database')
 const Service = use('App/Services/Order/OrderService')
+const transformer = use('App/Transformers/Admin/OrderTransformer')
 
 class OrderController {
 
-  async index ({ request, response, pagination }) {
+  async index ({ request, response, pagination, transform }) {
     const query = Order.query()
     const { status, id } = request.only(['status', 'id'])
 
@@ -26,16 +27,17 @@ class OrderController {
       query.orWhere('id', 'LIKE', `%${id}%`)
     }
 
-    const orders = await query.paginate(pagination.page, pagination.limit)
+    var orders = await query.paginate(pagination.page, pagination.limit)
+    orders = await transform.paginate(orders, transformer)
     return response.send(orders)
   }
 
-  async store ({ request, response }) {
+  async store ({ request, response, transform }) {
     const trx = await Database.beginTransaction()
 
     try {
       const { user_id, items, status } = request.all()
-      let order = await Order.create({ user_id, items, status }, trx)
+      var order = await Order.create({ user_id, items, status }, trx)
       const service = new Service(order, trx)
 
       if(items && items.length > 0) {
@@ -45,6 +47,7 @@ class OrderController {
       await order.save() // tirar caso dê erro
       await trx.commit()
 
+      order = await transform.item(order, transformer)
       return response.status(201).send(order)
 
     } catch (error) {
@@ -55,14 +58,15 @@ class OrderController {
     }
   }
 
-  async show ({ params: { id }, response }) {
-    const order = await Order.findOrFail(id)
+  async show ({ params: { id }, response, transform }) {
+    var order = await Order.findOrFail(id)
 
+    order = await transform.item(order, transformer)
     return response.send(order)
   }
 
-  async update ({ params: { id }, request, response }) {
-    const order = await Order.findOrFail(id)
+  async update ({ params: { id }, request, response, transform }) {
+    var order = await Order.findOrFail(id)
     const trx = await Database.beginTransaction()
 
     try {
@@ -74,6 +78,7 @@ class OrderController {
       await order.save(trx)
 
       await trx.commit()
+      order = await transform.item(order, transformer)
       return response.send(order)
     } catch (error) {
       await trx.rollback()
