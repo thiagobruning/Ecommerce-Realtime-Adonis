@@ -20,7 +20,7 @@ class CouponController {
     }
 
     var coupons = await query.paginate(pagination.page, pagination.limit)
-    coupons = await transform.paginate()
+    coupons = await transform.paginate(coupons, transformer)
     return response.send(coupons)
   }
 

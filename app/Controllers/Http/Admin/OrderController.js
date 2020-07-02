@@ -37,17 +37,19 @@ class OrderController {
 
     try {
       const { user_id, items, status } = request.all()
-      var order = await Order.create({ user_id, items, status }, trx)
+      var order = await Order.create({ user_id, status }, trx)
       const service = new Service(order, trx)
 
       if(items && items.length > 0) {
         await service.syncItems(items)
       }
 
-      await order.save() // tirar caso dê erro
       await trx.commit()
 
-      order = await transform.item(order, transformer)
+      order = await Order.find(order.id)
+      order = await transform
+        .include('user, items')
+        .item(order, transformer)
       return response.status(201).send(order)
 
     } catch (error) {

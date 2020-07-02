@@ -9,7 +9,7 @@ class OrderSchema extends Schema {
       table.increments()
       table.decimal('total', 12,2).defaultTo(0.0)
       table.integer('user_id').unsigned()
-      table.enu('status', ['pending', 'canceled', 'shipped', 'paid', 'finished']) // situações do pedido
+      table.enu('status', ['pending', 'canceled', 'shipped', 'paid', 'finished']).defaultTo('pending') // situações do pedido
       table.timestamps()
 
       // pedido tem um usuario
@@ -17,6 +17,7 @@ class OrderSchema extends Schema {
         .references('id')
         .inTable('users')
         .onDelete('CASCADE')
+        .onUpdate('CASCADE')
     })
   }
 

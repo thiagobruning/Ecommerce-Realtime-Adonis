@@ -16,7 +16,7 @@ class OrderService {
     }
 
     await this.model.items().delete(this.trx)
-    await this.model.createMany(items, this.trx)
+    return await this.model.items().createMany(items, this.trx)
   }
 
   async updateItems(items) {
@@ -34,7 +34,7 @@ class OrderService {
 
     // update the items inside a order
     await Promise.all(currentItems.rows.map( async item => {
-      item.fill(items.find(n => n.id === item.id))
+      item.fill(items.filter(n => n.id === item.id)[0])
       await item.save(this.trx)
     }))
   }
