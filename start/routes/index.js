@@ -24,7 +24,7 @@ Route.get('v1/me', 'UserController.me')
   .as('me')
   .middleware('auth')
 
-Route.get('dashboard', 'Admin/DashboardController.index').as('dashboard')
+Route.get('v1/admin/dashboard', 'Admin/DashboardController.index').as('dashboard')
 
 /**
  * import routes
