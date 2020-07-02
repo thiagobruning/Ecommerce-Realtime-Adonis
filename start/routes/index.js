@@ -20,6 +20,12 @@ Route.get('/', () => {
   return { greeting: 'Welcome to Adonis.js Ecommerce API!' }
 })
 
+Route.get('v1/me', 'UserController.me')
+  .as('me')
+  .middleware('auth')
+
+Route.get('dashboard', 'Admin/DashboardController.index').as('dashboard')
+
 /**
  * import routes
  */
